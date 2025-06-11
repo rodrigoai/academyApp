@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Treino Interativo 3x Semana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        * Workout Schedule (Agenda): Goal: Inform. Method: HTML styled list. Interaction: None. Justification: Clear, direct presentation of the weekly plan.
+        * General Recommendations: Goal: Inform. Method: HTML text with headings/bullets. Interaction: None. Justification: Easily digestible advice.
+        * Workout/Rest Day Distribution: Goal: Inform (visual summary). Method: Chart.js Doughnut Chart. Interaction: Hover for tooltips. Justification: Provides a quick visual overview of weekly commitment. Library: Chart.js.
+        * Exercises (Treino A, B, C): Goal: Inform, Organize. Method: HTML cards (divs with Tailwind) with relevant images from public CDNs. Interaction: None beyond navigation. Justification: Structured display of each exercise's details, greatly enhanced with visual cues for equipment/movement.
+        * Success Tips: Goal: Inform. Method: HTML styled list/cards. Interaction: None. Justification: Clear presentation of supplementary advice.
+        * Log de Treinos: Goal: Track progress, record data. Method: HTML form with date and select inputs, and a dynamically updated HTML list. Interaction: Input and button click to save, display of past entries. Justification: Provides a simple, persistent way for users to log their workouts directly within the application.
+        * CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visual elements are HTML/CSS/Tailwind, Chart.js Canvas, or image URLs. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .nav-button.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px; /* Adjusted for doughnut chart */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .exercise-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease-in-out;
+        }
+        .exercise-card:hover {
+            transform: translateY(-5px);
+        }
+        .log-entry {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <header class="bg-sky-700 text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-center">Plano de Treino Interativo 3x Semana</h1>
+            <p class="text-center text-sky-100 mt-1">Seu guia para força e hipertrofia com treinos eficientes.</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4 py-3">
+                <button data-tab="visao-geral" class="nav-button active text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Visão Geral</button>
+                <button data-tab="treino-a" class="nav-button text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Treino A</button>
+                <button data-tab="treino-b" class="nav-button text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Treino B</button>
+                <button data-tab="treino-c" class="nav-button text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Treino C</button>
+                <button data-tab="dicas" class="nav-button text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Dicas de Sucesso</button>
+                <button data-tab="log" class="nav-button text-sm sm:text-base font-medium text-stone-700 hover:bg-sky-500 hover:text-white py-2 px-3 sm:px-4 rounded-md transition-colors duration-200">Log de Treinos</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <section id="visao-geral" class="tab-content active">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-6">Visão Geral do Plano</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Bem-vindo ao seu plano de treino de musculação masculino, desenhado para otimizar o ganho de força e hipertrofia com 3 treinos semanais. Este programa distribui o trabalho muscular de forma equilibrada, permitindo uma boa recuperação e maximizando seu desempenho. Navegue pelas abas para explorar a agenda, os detalhes de cada treino e dicas essenciais para o seu sucesso.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-sky-600 mb-4">Agenda de Treinos Sugerida</h3>
+                    <ul class="list-disc list-inside space-y-2 text-stone-700">
+                        <li><strong>Dia 1 (Ex: Segunda-feira):</strong> Treino A (Membros Superiores - Empurrar + Membros Inferiores - Posterior)</li>
+                        <li><strong>Dia 2 (Ex: Terça-feira):</strong> Descanso Ativo ou Total</li>
+                        <li><strong>Dia 3 (Ex: Quarta-feira):</strong> Treino B (Membros Superiores - Puxar + Membros Inferiores - Anterior)</li>
+                        <li><strong>Dia 4 (Ex: Quinta-feira):</strong> Descanso Ativo ou Total</li>
+                        <li><strong>Dia 5 (Ex: Sexta-feira):</strong> Treino C (Corpo Total - Foco em Força e Equilíbrio)</li>
+                        <li><strong>Dias 6 e 7 (Ex: Sábado e Domingo):</strong> Descanso Ativo ou Total</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center justify-center">
+                    <h3 class="text-xl font-semibold text-sky-600 mb-4 text-center">Distribuição Semanal</h3>
+                    <div class="chart-container">
+                        <canvas id="workoutDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-sky-600 mb-4">Recomendações Gerais para Todos os Treinos</h3>
+                <ul class="space-y-3 text-stone-700">
+                    <li><strong><span class="text-sky-700">➔</span> Aquecimento (5-10 minutos):</strong> Inicie com cardiovascular leve e alongamentos dinâmicos.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Séries e Repetições:</strong> 3-4 séries por exercício, com repetições variando para desafiar os músculos.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Carga:</strong> Escolha um peso que permita completar as repetições com boa forma, próximo à falha.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Descanso entre Séries:</strong> 90s-2min para compostos/força; 60-90s para isolados/hipertrofia.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Cadência:</strong> Controle nas fases concêntrica e excêntrica.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Progressão:</strong> Aumente peso, repetições ou séries ao longo das semanas.</li>
+                    <li><strong><span class="text-sky-700">➔</span> Resfriamento (5-10 minutos):</strong> Finalize com alongamentos estáticos.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="treino-a" class="tab-content">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-2">Treino A: Empurrar (Peito, Ombro, Tríceps) + Posterior de Membros Inferiores</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Este treino foca nos movimentos de "empurrar" para a parte superior do corpo, fortalecendo peito, ombros e tríceps, combinado com exercícios para os músculos posteriores das pernas, como isquiotibiais e glúteos. Prepare-se para um treino intenso e eficaz!
+            </p>
+            <div class="space-y-4">
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando supino reto com barra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">1. Supino Reto com Barra</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Peito (anterior), Ombro (anterior), Tríceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2fcd35b67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando desenvolvimento militar com halteres]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">2. Desenvolvimento Militar com Halteres (Sentado ou em Pé)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Ombros (todos os deltoides), Tríceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1603572832876-0f72f0c7d5c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando crucifixo inclinado com halteres]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">3. Crucifixo Inclinado com Halteres</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 10-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Peito (superior).</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2fcd35b67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando elevação lateral com halteres]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">4. Elevação Lateral com Halteres</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 12-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Ombro (lateral).</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1594916892305-65a882a89c74?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando stiff com barra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">5. Stiff com Barra ou Halteres</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Isquiotibiais (posterior da coxa), Glúteos, Lombar.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1534368959878-b530d958f50a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Mulher usando máquina de cadeira flexora]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">6. Cadeira Flexora (Deitado ou Sentado)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 10-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Isquiotibiais.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2fcd35b67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Pessoa realizando extensão de panturrilhas em pé]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">7. Extensão de Panturrilhas em Pé (na máquina ou com halteres)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries de 15-20 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Panturrilha (gastrocnêmio e sóleo).</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="treino-b" class="tab-content">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-2">Treino B: Puxar (Costas, Bíceps) + Anterior de Membros Inferiores</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                O Treino B é dedicado aos movimentos de "puxar", trabalhando intensamente os músculos das costas e bíceps, e também foca na parte anterior das pernas, com ênfase no quadríceps. Este treino promove força e volume muscular de forma integrada.
+            </p>
+             <div class="space-y-4">
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando puxada alta no pulley]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">1. Barra Fixa (ou Puxada Alta no Pulley - Pegada Pronada)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries até a falha (ou 8-12 repetições no Pulley)</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Costas (grande dorsal), Bíceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando remada curvada com barra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">2. Remada Curvada com Barra (ou Remada no Banco Inclinado com Halteres)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Costas (meio e superior), Bíceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando remada unilateral com haltere]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">3. Remada Unilateral com Haltere (Serrote)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 10-12 repetições por lado</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Costas (grande dorsal), Bíceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2fcd35b67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando rosca direta com barra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">4. Rosca Direta com Barra (ou Halteres)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Bíceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1584860269201-9258284793f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando agachamento livre com barra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">5. Agachamento Livre com Barra</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 4 séries de 6-10 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Quadríceps (anterior da coxa), Glúteos, Isquiotibiais, Lombar.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1534368959878-b530d958f50a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Pessoa usando máquina de leg press]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">6. Leg Press 45º</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 10-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Quadríceps, Glúteos.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1534368959878-b530d958f50a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Pessoa usando máquina de cadeira extensora]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">7. Cadeira Extensora</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 12-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Quadríceps.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="treino-c" class="tab-content">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-2">Treino C: Corpo Total (Força e Equilíbrio)</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                O Treino C é um treino de corpo total, desenhado para estimular múltiplos grupos musculares em uma única sessão. Com foco em exercícios compostos, ele é ideal para desenvolver força funcional, equilíbrio muscular e encerrar a semana com um estímulo metabólico elevado.
+            </p>
+            <div class="space-y-4">
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1594916892305-65a882a89c74?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando levantamento terra]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">1. Levantamento Terra</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3-4 séries de 5-8 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Corpo Total (foco em Posterior de Coxa, Glúteos, Lombar, Costas). Priorize a técnica perfeita.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2fcd35b67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Mulher realizando afundo com halteres]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">2. Afundo com Halteres (ou Agachamento Búlgaro)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 8-12 repetições por perna</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Quadríceps, Glúteos, Isquiotibiais.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1603572832876-0f72f0c7d5c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando supino inclinado com halteres]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">3. Supino Inclinado com Halteres</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 8-12 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Peito (superior), Ombro (anterior), Tríceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Homem realizando puxada frontal no pulley]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">4. Puxada Frontal no Pulley (Pegada Neutra ou Supinada)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 10-15 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Costas (grande dorsal), Bíceps.</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Pessoa realizando prancha abdominal]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">5. Prancha Abdominal</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries, segurar por 45-60 segundos</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Core (abdômen e lombar).</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1534368959878-b530d958f50a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="[Image of Pessoa usando roda abdominal]" class="w-full h-auto rounded-md mb-4">
+                    <h4 class="text-lg font-semibold text-sky-600">6. Abdominais na Roda (ou Elevação de Pernas)</h4>
+                    <p class="text-stone-600"><strong>Séries e Repetições:</strong> 3 séries de 12-20 repetições</p>
+                    <p class="text-stone-500 italic text-sm">Músculos Principais: Abdômen.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dicas" class="tab-content">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-2">Dicas Adicionais para o Sucesso</h2>
+             <p class="mb-6 text-lg leading-relaxed">
+                Além dos treinos, alguns hábitos são fundamentais para maximizar seus resultados, garantir sua recuperação e manter a motivação. Confira estas dicas essenciais para complementar seu esforço na academia e alcançar seus objetivos de forma sustentável.
+            </p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">🥗 Nutrição</h4>
+                    <p class="text-stone-600">Uma dieta balanceada e rica em proteínas é fundamental. Considere a ingestão adequada de carboidratos para energia e gorduras saudáveis.</p>
+                </div>
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">💧 Hidratação</h4>
+                    <p class="text-stone-600">Mantenha-se bem hidratado ao longo do dia, especialmente antes, durante e após os treinos.</p>
+                </div>
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">😴 Sono</h4>
+                    <p class="text-stone-600">Priorize 7-9 horas de sono de qualidade. É durante o sono que ocorre grande parte da recuperação muscular.</p>
+                </div>
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">💪 Consistência</h4>
+                    <p class="text-stone-600">A regularidade é a chave para ver resultados. Siga o plano o máximo possível.</p>
+                </div>
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">👂 Escute seu Corpo</h4>
+                    <p class="text-stone-600">Se sentir dores agudas ou fadiga excessiva, não hesite em descansar ou ajustar a intensidade.</p>
+                </div>
+                <div class="exercise-card">
+                    <h4 class="text-lg font-semibold text-sky-600 mb-2">👨‍🏫 Profissional</h4>
+                    <p class="text-stone-600">Se possível, consulte um profissional de educação física para ajustes individuais e correção da forma.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="log" class="tab-content">
+            <h2 class="text-2xl font-semibold text-sky-700 mb-2">Log de Treinos</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Use esta seção para registrar seus treinos diários. Selecione a data e o tipo de treino realizado para manter um histórico completo de sua jornada fitness.
+            </p>
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-sky-600 mb-4">Registrar Novo Treino</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label for="logDate" class="block text-sm font-medium text-stone-700 mb-1">Data:</label>
+                        <input type="date" id="logDate" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label for="logWorkoutType" class="block text-sm font-medium text-stone-700 mb-1">Tipo de Treino:</label>
+                        <select id="logWorkoutType" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                            <option value="">Selecione o Treino</option>
+                            <option value="Treino A">Treino A</option>
+                            <option value="Treino B">Treino B</option>
+                            <option value="Treino C">Treino C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button id="addLogEntry" class="w-full bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-700 transition-colors duration-200">Registrar Treino</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-sky-600 mb-4">Histórico de Treinos</h3>
+                <div id="logEntriesList" class="space-y-3">
+                    <p class="text-stone-500 text-center" id="noLogMessage">Nenhum treino registrado ainda.</p>
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-800 text-stone-300 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; <span id="currentYear"></span> Plano de Treino Interativo. Todos os direitos reservados.</p>
+            <p class="text-sm mt-1">Desenvolvido para otimizar sua jornada fitness.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const logDateInput = document.getElementById('logDate');
+            const logWorkoutTypeSelect = document.getElementById('logWorkoutType');
+            const addLogEntryButton = document.getElementById('addLogEntry');
+            const logEntriesList = document.getElementById('logEntriesList');
+            const noLogMessage = document.getElementById('noLogMessage');
+
+            // Set current date as default for logDateInput
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            logDateInput.value = `${year}-${month}-${day}`;
+
+            const initialTab = 'visao-geral';
+            document.querySelector(`.nav-button[data-tab="${initialTab}"]`).classList.add('active');
+            document.getElementById(initialTab).classList.add('active');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+
+                    if (tabId === 'log') {
+                        renderLogEntries();
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('workoutDistributionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Dias de Treino', 'Dias de Descanso/Ativo'],
+                    datasets: [{
+                        label: 'Distribuição Semanal',
+                        data: [3, 4],
+                        backgroundColor: [
+                            'rgba(2, 132, 199, 0.8)',
+                            'rgba(120, 113, 108, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(2, 132, 199, 1)',
+                            'rgba(120, 113, 108, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#333',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' dias';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Log de Treinos Functions
+            function getLogEntries() {
+                const entries = localStorage.getItem('workoutLog');
+                return entries ? JSON.parse(entries) : [];
+            }
+
+            function saveLogEntries(entries) {
+                localStorage.setItem('workoutLog', JSON.stringify(entries));
+            }
+
+            function renderLogEntries() {
+                let entries = getLogEntries();
+                entries.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, newest first
+                logEntriesList.innerHTML = ''; // Clear existing entries
+
+                if (entries.length === 0) {
+                    noLogMessage.style.display = 'block';
+                } else {
+                    noLogMessage.style.display = 'none';
+                    entries.forEach(entry => {
+                        const logDiv = document.createElement('div');
+                        logDiv.classList.add('log-entry');
+                        logDiv.innerHTML = `
+                            <p class="font-semibold text-stone-800">${formatDate(entry.date)}</p>
+                            <p class="text-sky-700">${entry.workout}</p>
+                        `;
+                        logEntriesList.appendChild(logDiv);
+                    });
+                }
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString + 'T00:00:00'); // Add T00:00:00 to avoid timezone issues
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('pt-BR', options);
+            }
+
+            addLogEntryButton.addEventListener('click', () => {
+                const date = logDateInput.value;
+                const workoutType = logWorkoutTypeSelect.value;
+
+                if (date && workoutType) {
+                    const newEntry = { date, workout: workoutType };
+                    const entries = getLogEntries();
+                    entries.push(newEntry);
+                    saveLogEntries(entries);
+                    renderLogEntries(); // Re-render the list
+
+                    logDateInput.value = ''; // Clear form
+                    logWorkoutTypeSelect.value = '';
+                } else {
+                    alert('Por favor, selecione a data e o tipo de treino.'); // Using alert as per previous instruction for simple messages
+                }
+            });
+
+            // Initial render of log entries when the page loads (if log tab is active)
+            if (document.getElementById('log').classList.contains('active')) {
+                renderLogEntries();
+            }
+        });
+    </script>
+
+</body>
+</html>
